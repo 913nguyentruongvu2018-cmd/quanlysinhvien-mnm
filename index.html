@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Project 2 - Quản Lý Sinh Viên (Vercel Standalone)</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; background: #f4f7f6; }
+        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #007bff; }
+        .form { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; flex: 1; }
+        button { padding: 12px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border-bottom: 1px solid #eee; padding: 15px; text-align: left; }
+        th { background: #007bff; color: white; }
+        .btn-delete { background: #dc3545; padding: 5px 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🚀 PROJECT 2: QUẢN LÝ SINH VIÊN (VERCEL)</h2>
+        <div class="form">
+            <input type="text" id="name" placeholder="Họ Tên">
+            <input type="text" id="mssv" placeholder="MSSV">
+            <input type="text" id="class_name" placeholder="Lớp">
+            <button onclick="addStudent()">THÊM MỚI</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Họ Tên</th><th>MSSV</th><th>Lớp</th><th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody id="result"></tbody>
+        </table>
+    </div>
+
+    <script>
+        // GỌI TRỰC TIẾP API NỘI BỘ CỦA VERCEL
+        const API = '/api/students'; 
+
+        async function loadStudents() {
+            try {
+                const res = await fetch(API);
+                const data = await res.json();
+                // Hiển thị dữ liệu vào bảng
+                document.getElementById('result').innerHTML = data.map(s => `
+                    <tr>
+                        <td>${s.name}</td>
+                        <td>${s.mssv}</td>
+                        <td>${s.class_name}</td>
+                        <td>
+                            <button class="btn-delete" onclick="deleteStudent(${s.id})">Xóa</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error("Lỗi tải dữ liệu:", err);
+            }
+        }
+
+        async function addStudent() {
+            const name = document.getElementById('name').value;
+            const mssv = document.getElementById('mssv').value;
+            const class_name = document.getElementById('class_name').value;
+            
+            if (!name || !mssv || !class_name) return alert("Nhập đủ thông tin!");
+
+            await fetch(API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, mssv, class_name })
+            });
+
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            loadStudents();
+        }
+
+        async function deleteStudent(id) {
+            if (confirm('Xóa sinh viên này?')) {
+                await fetch(`${API}?id=${id}`, { method: 'DELETE' });
+                loadStudents();
+            }
+        }
+
+        // Tải dữ liệu ngay khi trang web mở
+        loadStudents();
+    </script>
+</body>
+</html>
