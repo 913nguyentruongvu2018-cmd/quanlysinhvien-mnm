@@ -149,16 +149,22 @@
             const name = document.getElementById('name').value;
             const mssv = document.getElementById('mssv').value;
             const class_name = document.getElementById('class_name').value;
+
             if (!name || !mssv || !class_name) return alert("Nhập đủ thông tin!");
+
+            // Thêm log để bạn kiểm tra trong Console (F12)
+            console.log("Đang gửi:", { name, mssv, class_name });
 
             await fetch(API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, mssv, class_name })
+                body: JSON.stringify({ name, mssv, class_name }) // class_name phải có gạch dưới
             });
-            clearInputs();
+
+            document.querySelectorAll('input').forEach(i => i.value = '');
             loadStudents();
         }
+
 
         async function deleteStudent(id) {
             if (confirm('Xóa sinh viên này?')) {
