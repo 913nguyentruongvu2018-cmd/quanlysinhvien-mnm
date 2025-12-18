@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Project 2 - Quản Lý Sinh Viên</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; background-color: #f4f4f9; }
+        h2 { text-align: center; color: #333; }
+        
+        /* Khung nhập liệu */
+        .input-group { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; gap: 10px; margin-bottom: 20px; }
+        input { padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1; }
+        
+        /* Nút bấm */
+        button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
+        .btn-add { background-color: #28a745; }
+        .btn-add:hover { background-color: #218838; }
+        .btn-delete { background-color: #dc3545; padding: 5px 10px; font-size: 13px; }
+        
+        /* Bảng danh sách */
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+        th { background-color: #007bff; color: white; }
+        tr:hover { background-color: #f1f1f1; }
+    </style>
+</head>
+<body>
+
+    <h2>🎓 PROJECT 2: QUẢN LÝ SINH VIÊN (Vercel + InfinityFree)</h2>
+
+    <div class="input-group">
+        <input type="text" id="name" placeholder="Họ và Tên">
+        <input type="text" id="mssv" placeholder="MSSV">
+        <input type="text" id="class_name" placeholder="Lớp">
+        <button class="btn-add" onclick="addStudent()">Thêm Mới</button>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Họ Tên</th>
+                <th>MSSV</th>
+                <th>Lớp</th>
+                <th>Hành Động</th>
+            </tr>
+        </thead>
+        <tbody id="student-list">
+            <tr><td colspan="5" style="text-align:center;">Đang tải dữ liệu...</td></tr>
+        </tbody>
+    </table>
+
+    <script>
+        // --- QUAN TRỌNG: THAY LINK API CỦA BẠN VÀO ĐÂY ---
+        // Ví dụ: http://truongvu-project2.infinityfreeapp.com/api.php
+        const API_URL = "http://quanlysinhvien.infinityfree.me/api.php"; 
+
+        // 1. Hàm lấy danh sách sinh viên
+        async function getStudents() {
+            try {
+                let response = await fetch(API_URL);
+                let data = await response.json(); // API trả về mảng [ {id, name...}, {...} ]
+                
+                let html = "";
+                data.forEach(st => {
+                    html += `
+                        <tr>
+                            <td>${st.id}</td>
+                            <td>${st.name}</td>
+                            <td>${st.mssv}</td>
+                            <td>${st.class_name}</td>
+                            <td>
+                                <button class="btn-delete" onclick="deleteStudent(${st.id})">Xóa</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('student-list').innerHTML = html;
+            } catch (error) {
+                console.log(error);
+                document.getElementById('student-list').innerHTML = `<tr><td colspan="5" style="color:red; text-align:center;">Lỗi kết nối API hoặc chưa thay Link!</td></tr>`;
+            }
+        }
+
+        // 2. Hàm thêm sinh viên
+        async function addStudent() {
+            let name = document.getElementById('name').value;
+            let mssv = document.getElementById('mssv').value;
+            let class_name = document.getElementById('class_name').value;
+
+            if(!name || !mssv) { alert("Vui lòng nhập đủ thông tin!"); return; }
+
+            await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: name, mssv: mssv, class_name: class_name })
+            });
+
+            // Xóa trắng ô nhập và tải lại bảng
+            document.getElementById('name').value = "";
+            document.getElementById('mssv').value = "";
+            document.getElementById('class_name').value = "";
+            getStudents(); 
+        }
+
+        // 3. Hàm xóa sinh viên
+        async function deleteStudent(id) {
+            if (confirm("Bạn có chắc muốn xóa sinh viên này?")) {
+                await fetch(`${API_URL}?id=${id}`, { method: "DELETE" });
+                getStudents(); // Tải lại bảng sau khi xóa
+            }
+        }
+
+        // Chạy hàm lấy danh sách ngay khi mở web
+        getStudents();
+    </script>
+
+</body>
+</html>
