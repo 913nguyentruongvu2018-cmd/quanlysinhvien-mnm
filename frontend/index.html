@@ -118,25 +118,19 @@
 
     <script>
         // THAY THẾ TOÀN BỘ ĐOẠN KHAI BÁO API CŨ
-        const REAL_API = "http://quanlysinhvien.infinityfree.me/backend/api.php";
-        const API = `https://api.allorigins.win/get?url=${encodeURIComponent(REAL_API)}`;
+        // GỌI TRỰC TIẾP - KHÔNG DÙNG PROXY NỮA
+        const API = "http://quanlysinhvien.infinityfree.me/frontend/index.php?api=1";
 
         async function loadStudents() {
             try {
                 const res = await fetch(API);
-                const json = await res.json();
-                // AllOrigins trả về dữ liệu trong biến .contents dưới dạng chuỗi
-                const data = JSON.parse(json.contents);
-
+                const data = await res.json();
                 document.getElementById('result').innerHTML = data.map(s => `
             <tr>
                 <td>${s.name}</td>
                 <td>${s.mssv}</td>
                 <td>${s.class_name}</td>
-                <td>
-                    <button class="btn-edit" onclick="editStudent(${s.id}, '${s.name}', '${s.mssv}', '${s.class_name}')">Sửa</button>
-                    <button class="btn-delete" onclick="deleteStudent(${s.id})">Xóa</button>
-                </td>
+                <td><button onclick="deleteStudent(${s.id})">Xóa</button></td>
             </tr>
         `).join('');
             } catch (err) {
