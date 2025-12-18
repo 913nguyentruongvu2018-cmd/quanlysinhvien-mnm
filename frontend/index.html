@@ -119,9 +119,9 @@
     <script>
         // SỬ DỤNG PROXY ĐỂ TRÁNH LỖI CORS
         // Link mới theo domain bạn vừa tạo
+        // Link mới từ image_db73ab.jpg
         const REAL_API = "http://quanlysinhvien.infinityfree.me/backend/api.php";
-        const PROXY = "https://cors-anywhere.herokuapp.com/";
-        const API = PROXY + REAL_API;
+        const API = "https://cors-anywhere.herokuapp.com/" + REAL_API;
 
         async function loadStudents() {
             try {

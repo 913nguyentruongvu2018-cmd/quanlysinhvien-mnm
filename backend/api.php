@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') { exit; }
 $host = "sql100.infinityfree.com"; 
 $user = "if0_40711936"; 
 $pass = "ROA04PmNoz"; 
-$db   = "if0_40711936_qlsv"; 
+$db   = "if0_40711936_qlsv";
 
 $conn = new mysqli($host, $user, $pass, $db);
 
