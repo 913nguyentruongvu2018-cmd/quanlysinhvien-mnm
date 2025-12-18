@@ -1,6 +1,6 @@
 import { MongoClient, ObjectId } from 'mongodb';
 
-// Lấy URI từ biến môi trường Vercel đã cài
+// Vercel sẽ tự lấy link này từ Environment Variables bạn đã cài
 const uri = process.env.MONGODB_URI;
 const client = new MongoClient(uri);
 
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
 
         if (req.method === 'GET') {
             const students = await collection.find({}).toArray();
-            // Map lại _id của Mongo thành id để giao diện không bị lỗi
+            // Đổi _id của Mongo thành id để giao diện hiển thị được
             const formatted = students.map(s => ({ ...s, id: s._id }));
             return res.status(200).json(formatted);
         }
@@ -26,15 +26,6 @@ export default async function handler(req, res) {
         if (req.method === 'POST') {
             const { name, mssv, class_name } = req.body;
             await collection.insertOne({ name, mssv, class_name });
-            return res.status(200).json({ status: 'success' });
-        }
-
-        if (req.method === 'PUT') {
-            const { id, name, mssv, class_name } = req.body;
-            await collection.updateOne(
-                { _id: new ObjectId(id) },
-                { $set: { name, mssv, class_name } }
-            );
             return res.status(200).json({ status: 'success' });
         }
 
