@@ -16,7 +16,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/913nguyentruongvu2018-cmd/quanlysinhvien-mnm/issues"
   },
