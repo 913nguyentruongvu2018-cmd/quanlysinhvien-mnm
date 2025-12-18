@@ -1,25 +1,99 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <title>Project 2 - Quản Lý Sinh Viên (Vercel)</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; background: #e9ecef; }
-        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #343a40; margin-bottom: 25px; }
-        .form { display: flex; gap: 10px; margin-bottom: 30px; }
-        input { padding: 12px; border: 1px solid #ced4da; border-radius: 8px; flex: 1; font-size: 16px; }
-        button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
-        .btn-add { background: #007bff; color: white; }
-        .btn-add:hover { background: #0056b3; }
-        .btn-edit { background: #ffc107; color: #212529; }
-        .btn-delete { background: #dc3545; color: white; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
-        th { background: #f8f9fa; color: #495057; text-transform: uppercase; font-size: 14px; }
-        tr:hover { background-color: #f1f3f5; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 900px;
+            margin: 30px auto;
+            padding: 20px;
+            background: #e9ecef;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #343a40;
+            margin-bottom: 25px;
+        }
+
+        .form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        input {
+            padding: 12px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            flex: 1;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .btn-add {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #0056b3;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th,
+        td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: #f8f9fa;
+            color: #495057;
+            text-transform: uppercase;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: #f1f3f5;
+        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h2>🚀 PROJECT 2: QUẢN LÝ SINH VIÊN (VERCEL)</h2>
@@ -32,7 +106,10 @@
         <table>
             <thead>
                 <tr>
-                    <th>Họ Tên</th><th>MSSV</th><th>Lớp</th><th>Hành Động</th>
+                    <th>Họ Tên</th>
+                    <th>MSSV</th>
+                    <th>Lớp</th>
+                    <th>Hành Động</th>
                 </tr>
             </thead>
             <tbody id="result"></tbody>
@@ -41,8 +118,9 @@
 
     <script>
         // SỬ DỤNG PROXY ĐỂ TRÁNH LỖI CORS
+        // Link mới theo domain bạn vừa tạo
+        const REAL_API = "http://quanlysinhvien.infinityfree.me/backend/api.php";
         const PROXY = "https://cors-anywhere.herokuapp.com/";
-        const REAL_API = "http://nguyentruongvu.infinityfreeapp.com/backend/api.php";
         const API = PROXY + REAL_API;
 
         async function loadStudents() {
@@ -61,7 +139,7 @@
                         </td>
                     </tr>
                 `).join('');
-            } catch (err) { 
+            } catch (err) {
                 console.error("Lỗi:", err);
                 document.getElementById('result').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red">Vui lòng truy cập <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">link này</a> và bấm "Request temporary access" để kích hoạt Proxy!</td></tr>';
             }
@@ -71,7 +149,7 @@
             const name = document.getElementById('name').value;
             const mssv = document.getElementById('mssv').value;
             const class_name = document.getElementById('class_name').value;
-            if(!name || !mssv || !class_name) return alert("Nhập đủ thông tin!");
+            if (!name || !mssv || !class_name) return alert("Nhập đủ thông tin!");
 
             await fetch(API, {
                 method: 'POST',
@@ -83,7 +161,7 @@
         }
 
         async function deleteStudent(id) {
-            if(confirm('Xóa sinh viên này?')) {
+            if (confirm('Xóa sinh viên này?')) {
                 await fetch(`${API}?id=${id}`, { method: 'DELETE' });
                 loadStudents();
             }
@@ -93,7 +171,7 @@
             const name = prompt("Tên mới:", n);
             const mssv = prompt("MSSV mới:", m);
             const class_name = prompt("Lớp mới:", c);
-            if(name && mssv && class_name) {
+            if (name && mssv && class_name) {
                 await fetch(API, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
@@ -110,4 +188,5 @@
         loadStudents();
     </script>
 </body>
+
 </html>
