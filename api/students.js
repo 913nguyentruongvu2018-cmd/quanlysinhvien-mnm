@@ -11,24 +11,16 @@ export default async function handler(req, res) {
 
     try {
         await client.connect();
-        const col = client.db('student_management').collection('students');
+        const db = client.db('student_management');
+        const col = db.collection('students');
 
         if (req.method === 'GET') {
             const data = await col.find({}).toArray();
-            return res.status(200).json(data.map(s => ({ ...s, id: s._id })));
+            return res.status(200).json(data.map(s => ({ ...s, id: s._id.toString() })));
         }
 
         if (req.method === 'POST') {
             await col.insertOne(req.body);
-            return res.status(200).json({ status: 'success' });
-        }
-
-        if (req.method === 'PUT') {
-            const { id, name, mssv, class_name } = req.body;
-            await col.updateOne(
-                { _id: new ObjectId(id) },
-                { $set: { name, mssv, class_name } }
-            );
             return res.status(200).json({ status: 'success' });
         }
 
