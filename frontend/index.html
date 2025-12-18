@@ -54,7 +54,8 @@
     // Link API của bạn đã kiểm tra chạy được []
     // Thêm "https://cors-anywhere.herokuapp.com/" vào trước link của bạn
 // Thay link corsproxy.io bằng link của api.allorigins.win
-const API_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent("https://quanlysinhvien.infinityfree.me/api.php");
+// Thử dùng Proxy của Cloudflare (ổn định hơn AllOrigins lúc này)
+const API_URL = "https://cors-anywhere.herokuapp.com/https://quanlysinhvien.infinityfree.me/api.php";
 
     async function getStudents() {
         const tableBody = document.getElementById('student-list');
