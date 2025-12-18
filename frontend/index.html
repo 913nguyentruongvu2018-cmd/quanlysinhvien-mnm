@@ -2,107 +2,112 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Project 2 - Quản Lý Sinh Viên</title>
+    <title>Project 2 - Quản Lý Sinh Viên (Vercel)</title>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; background-color: #f4f4f9; }
-        h2 { text-align: center; color: #333; }
-        
-        /* Khung nhập liệu */
-        .input-group { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; gap: 10px; margin-bottom: 20px; }
-        input { padding: 10px; border: 1px solid #ddd; border-radius: 4px; flex: 1; }
-        
-        /* Nút bấm */
-        button { padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; color: white; font-weight: bold; }
-        .btn-add { background-color: #28a745; }
-        .btn-add:hover { background-color: #218838; }
-        .btn-delete { background-color: #dc3545; padding: 5px 10px; font-size: 13px; }
-        
-        /* Bảng danh sách */
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background-color: #007bff; color: white; }
-        tr:hover { background-color: #f1f1f1; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 900px; margin: 30px auto; padding: 20px; background: #e9ecef; }
+        .container { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #343a40; margin-bottom: 25px; }
+        .form { display: flex; gap: 10px; margin-bottom: 30px; }
+        input { padding: 12px; border: 1px solid #ced4da; border-radius: 8px; flex: 1; font-size: 16px; }
+        button { padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: 0.3s; }
+        .btn-add { background: #007bff; color: white; }
+        .btn-add:hover { background: #0056b3; }
+        .btn-edit { background: #ffc107; color: #212529; }
+        .btn-delete { background: #dc3545; color: white; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid #dee2e6; }
+        th { background: #f8f9fa; color: #495057; text-transform: uppercase; font-size: 14px; }
+        tr:hover { background-color: #f1f3f5; }
     </style>
 </head>
 <body>
-
-    <h2>🎓 PROJECT 2: QUẢN LÝ SINH VIÊN (Vercel + InfinityFree)</h2>
-
-    <div class="input-group">
-        <input type="text" id="name" placeholder="Họ và Tên">
-        <input type="text" id="mssv" placeholder="MSSV">
-        <input type="text" id="class_name" placeholder="Lớp">
-        <button class="btn-add" onclick="addStudent()">Thêm Mới</button>
+    <div class="container">
+        <h2>🚀 PROJECT 2: QUẢN LÝ SINH VIÊN (VERCEL)</h2>
+        <div class="form">
+            <input type="text" id="name" placeholder="Họ Tên">
+            <input type="text" id="mssv" placeholder="MSSV">
+            <input type="text" id="class_name" placeholder="Lớp">
+            <button class="btn-add" onclick="addStudent()">THÊM MỚI</button>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Họ Tên</th><th>MSSV</th><th>Lớp</th><th>Hành Động</th>
+                </tr>
+            </thead>
+            <tbody id="result"></tbody>
+        </table>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Họ Tên</th>
-                <th>MSSV</th>
-                <th>Lớp</th>
-                <th>Hành Động</th>
-            </tr>
-        </thead>
-        <tbody id="student-list">
-            <tr><td colspan="5" style="text-align:center;">Đang tải dữ liệu...</td></tr>
-        </tbody>
-    </table>
-
     <script>
-    // Link API của bạn đã kiểm tra chạy được []
-    // Thêm "https://cors-anywhere.herokuapp.com/" vào trước link của bạn
-// Thay link corsproxy.io bằng link của api.allorigins.win
-// Thử dùng Proxy của Cloudflare (ổn định hơn AllOrigins lúc này)
-const API_URL = "https://cors-anywhere.herokuapp.com/https://quanlysinhvien.infinityfree.me/api.php";
+        // SỬ DỤNG PROXY ĐỂ TRÁNH LỖI CORS
+        const PROXY = "https://cors-anywhere.herokuapp.com/";
+        const REAL_API = "http://nguyentruongvu.infinityfreeapp.com/backend/api.php";
+        const API = PROXY + REAL_API;
 
-    async function getStudents() {
-        const tableBody = document.getElementById('student-list');
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error('Mạng lỗi hoặc Host chặn');
-            const data = await response.json();
-            
-            tableBody.innerHTML = "";
-            data.forEach(student => {
-                tableBody.innerHTML += `
+        async function loadStudents() {
+            try {
+                // Lưu ý: Lần đầu chạy có thể cần vào https://cors-anywhere.herokuapp.com/corsdemo để bấm "Request Access"
+                const res = await fetch(API);
+                const data = await res.json();
+                document.getElementById('result').innerHTML = data.map(s => `
                     <tr>
-                        <td>${student.id}</td>
-                        <td>${student.name}</td>
-                        <td>${student.mssv}</td>
-                        <td>${student.class_name}</td>
-                        <td><button onclick="deleteStudent(${student.id})">Xóa</button></td>
-                    </tr>`;
-            });
-        } catch (error) {
-            console.error("Lỗi chi tiết:", error);
-            tableBody.innerHTML = `<tr><td colspan="5" style="color:red">Lỗi: ${error.message}. Hãy mở link API trực tiếp trước!</td></tr>`;
+                        <td>${s.name}</td>
+                        <td>${s.mssv}</td>
+                        <td>${s.class_name}</td>
+                        <td>
+                            <button class="btn-edit" onclick="editStudent(${s.id}, '${s.name}', '${s.mssv}', '${s.class_name}')">Sửa</button>
+                            <button class="btn-delete" onclick="deleteStudent(${s.id})">Xóa</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) { 
+                console.error("Lỗi:", err);
+                document.getElementById('result').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red">Vui lòng truy cập <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">link này</a> và bấm "Request temporary access" để kích hoạt Proxy!</td></tr>';
+            }
         }
-    }
 
-    async function addStudent() {
-        const name = document.getElementById('name').value;
-        const mssv = document.getElementById('mssv').value;
-        const class_name = document.getElementById('class_name').value;
+        async function addStudent() {
+            const name = document.getElementById('name').value;
+            const mssv = document.getElementById('mssv').value;
+            const class_name = document.getElementById('class_name').value;
+            if(!name || !mssv || !class_name) return alert("Nhập đủ thông tin!");
 
-        if(!name || !mssv || !class_name) return alert("Vui lòng nhập đủ!");
-
-        try {
-            await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
+            await fetch(API, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, mssv, class_name })
             });
-            getStudents(); // Load lại bảng
-        } catch (error) {
-            alert("Không thêm được sinh viên!");
+            clearInputs();
+            loadStudents();
         }
-    }
 
-    // Chạy hàm lấy danh sách khi vừa mở web
-    getStudents();
-</script>
+        async function deleteStudent(id) {
+            if(confirm('Xóa sinh viên này?')) {
+                await fetch(`${API}?id=${id}`, { method: 'DELETE' });
+                loadStudents();
+            }
+        }
 
+        async function editStudent(id, n, m, c) {
+            const name = prompt("Tên mới:", n);
+            const mssv = prompt("MSSV mới:", m);
+            const class_name = prompt("Lớp mới:", c);
+            if(name && mssv && class_name) {
+                await fetch(API, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, mssv, class_name })
+                });
+                loadStudents();
+            }
+        }
+
+        function clearInputs() {
+            document.querySelectorAll('input').forEach(i => i.value = '');
+        }
+
+        loadStudents();
+    </script>
 </body>
 </html>
