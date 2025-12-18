@@ -52,7 +52,8 @@
 
     <script>
     // Link API của bạn đã kiểm tra chạy được []
-    const API_URL = "https://quanlysinhvien.infinityfree.me/api.php";
+    // Thêm "https://cors-anywhere.herokuapp.com/" vào trước link của bạn
+const API_URL = "https://corsproxy.io/?https://quanlysinhvien.infinityfree.me/api.php";
 
     async function getStudents() {
         const tableBody = document.getElementById('student-list');
