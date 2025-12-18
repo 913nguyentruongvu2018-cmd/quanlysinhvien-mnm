@@ -84,19 +84,22 @@
         }
 
         async function addStudent() {
-            const name = document.getElementById('name').value;
-            const mssv = document.getElementById('mssv').value;
-            const class_name = document.getElementById('class').value;
-            if (!name || !mssv) return alert("Nhập đủ tên và MSSV!");
+    const name = document.getElementById('name').value;
+    const mssv = document.getElementById('mssv').value;
+    const class_name = document.getElementById('class').value; // Lấy đúng ID 'class'
+    
+    if (!name || !mssv) return alert("Nhập đủ tên và MSSV!");
 
-            await fetch(API, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, mssv, class_name })
-            });
-            document.querySelectorAll('input').forEach(i => i.value = '');
-            load();
-        }
+    // Sửa lại API: Bỏ đuôi .js
+    await fetch('/api/students', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, mssv, class_name })
+    });
+    
+    document.querySelectorAll('input').forEach(i => i.value = '');
+    load();
+}
 
         async function del(id) {
             if (confirm("Xóa sinh viên này?")) {
