@@ -1,90 +1,154 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
-    <title>Project 2 - Quản Lý Sinh Viên (Vercel Standalone)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Quản Lý Sinh Viên Pro - Vercel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; max-width: 800px; margin: 30px auto; padding: 20px; background: #f4f7f6; }
-        .container { background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #007bff; }
-        .form { display: flex; gap: 10px; margin-bottom: 20px; }
-        input { padding: 12px; border: 1px solid #ddd; border-radius: 6px; flex: 1; }
-        button { padding: 12px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border-bottom: 1px solid #eee; padding: 15px; text-align: left; }
-        th { background: #007bff; color: white; }
-        .btn-delete { background: #dc3545; padding: 5px 10px; font-size: 12px; }
+        body {
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+
+        .table thead {
+            background-color: #0d6efd;
+            color: white;
+        }
+
+        .stats-box {
+            background: #e7f1ff;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h2>🚀 PROJECT 2: QUẢN LÝ SINH VIÊN (VERCEL)</h2>
-        <div class="form">
-            <input type="text" id="name" placeholder="Họ Tên">
-            <input type="text" id="mssv" placeholder="MSSV">
-            <input type="text" id="class_name" placeholder="Lớp">
-            <button onclick="addStudent()">THÊM MỚI</button>
+    <div class="container py-5">
+        <div class="card p-4">
+            <h2 class="text-center text-primary mb-4">🎓 QUẢN LÝ SINH VIÊN CHUYÊN NGHIỆP</h2>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <div class="stats-box">
+                        <strong>Tổng số sinh viên: </strong> <span id="total-count" class="badge bg-primary">0</span>
+                    </div>
+                </div>
+                <div class="col-md-6 text-end">
+                    <input type="text" id="searchInput" class="form-control" placeholder="🔍 Tìm kiếm tên hoặc MSSV..."
+                        onkeyup="searchStudent()">
+                </div>
+            </div>
+
+            <div class="row g-2 mb-4">
+                <div class="col-md-3"><input type="text" id="name" class="form-control" placeholder="Họ Tên"></div>
+                <div class="col-md-3"><input type="text" id="mssv" class="form-control" placeholder="MSSV"></div>
+                <div class="col-md-3"><input type="text" id="class_name" class="form-control" placeholder="Lớp"></div>
+                <div class="col-md-3">
+                    <button class="btn btn-success w-100" onclick="addStudent()">+ THÊM MỚI</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Họ Tên</th>
+                            <th>MSSV</th>
+                            <th>Lớp</th>
+                            <th class="text-center">Hành Động</th>
+                        </tr>
+                    </thead>
+                    <tbody id="result"></tbody>
+                </table>
+            </div>
         </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Họ Tên</th><th>MSSV</th><th>Lớp</th><th>Hành Động</th>
-                </tr>
-            </thead>
-            <tbody id="result"></tbody>
-        </table>
     </div>
 
     <script>
-        // GỌI TRỰC TIẾP API NỘI BỘ CỦA VERCEL
-        const API = '/api/students'; 
+        const API = '/api/students';
+        let allStudents = [];
 
         async function loadStudents() {
             try {
                 const res = await fetch(API);
-                const data = await res.json();
-                // Hiển thị dữ liệu vào bảng
-                document.getElementById('result').innerHTML = data.map(s => `
-                    <tr>
-                        <td>${s.name}</td>
-                        <td>${s.mssv}</td>
-                        <td>${s.class_name}</td>
-                        <td>
-                            <button class="btn-delete" onclick="deleteStudent(${s.id})">Xóa</button>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                console.error("Lỗi tải dữ liệu:", err);
-            }
+                allStudents = await res.json();
+                renderTable(allStudents);
+            } catch (err) { console.error("Lỗi:", err); }
+        }
+
+        function renderTable(data) {
+            document.getElementById('total-count').innerText = data.length;
+            document.getElementById('result').innerHTML = data.map(s => `
+                <tr>
+                    <td><strong>${s.name}</strong></td>
+                    <td><span class="badge bg-secondary">${s.mssv}</span></td>
+                    <td>${s.class_name}</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-warning me-1" onclick="editStudent(${s.id},'${s.name}','${s.mssv}','${s.class_name}')">Sửa</button>
+                        <button class="btn btn-sm btn-danger" onclick="deleteStudent(${s.id})">Xóa</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function searchStudent() {
+            const term = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allStudents.filter(s =>
+                s.name.toLowerCase().includes(term) || s.mssv.includes(term)
+            );
+            renderTable(filtered);
         }
 
         async function addStudent() {
             const name = document.getElementById('name').value;
             const mssv = document.getElementById('mssv').value;
             const class_name = document.getElementById('class_name').value;
-            
-            if (!name || !mssv || !class_name) return alert("Nhập đủ thông tin!");
+            if (!name || !mssv || !class_name) return alert("Vui lòng nhập đủ thông tin!");
 
             await fetch(API, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name, mssv, class_name })
             });
-
-            document.querySelectorAll('input').forEach(i => i.value = '');
+            clearInput();
             loadStudents();
         }
 
         async function deleteStudent(id) {
-            if (confirm('Xóa sinh viên này?')) {
+            if (confirm("Xác nhận xóa sinh viên này?")) {
                 await fetch(`${API}?id=${id}`, { method: 'DELETE' });
                 loadStudents();
             }
         }
 
-        // Tải dữ liệu ngay khi trang web mở
+        async function editStudent(id, n, m, c) {
+            const name = prompt("Cập nhật Họ Tên:", n);
+            if (name) {
+                await fetch(API, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, name, mssv: m, class_name: c })
+                });
+                loadStudents();
+            }
+        }
+
+        function clearInput() {
+            document.getElementById('name').value = '';
+            document.getElementById('mssv').value = '';
+            document.getElementById('class_name').value = '';
+        }
+
         loadStudents();
     </script>
 </body>
+
 </html>
