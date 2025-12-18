@@ -117,33 +117,34 @@
     </div>
 
     <script>
-        // SỬ DỤNG PROXY ĐỂ TRÁNH LỖI CORS
-        // Link mới theo domain bạn vừa tạo
-        // Link mới từ image_db73ab.jpg
+        // THAY THẾ TOÀN BỘ ĐOẠN KHAI BÁO API CŨ
         const REAL_API = "http://quanlysinhvien.infinityfree.me/backend/api.php";
-        const API = "https://cors-anywhere.herokuapp.com/" + REAL_API;
+        const API = `https://api.allorigins.win/get?url=${encodeURIComponent(REAL_API)}`;
 
         async function loadStudents() {
             try {
-                // Lưu ý: Lần đầu chạy có thể cần vào https://cors-anywhere.herokuapp.com/corsdemo để bấm "Request Access"
                 const res = await fetch(API);
-                const data = await res.json();
+                const json = await res.json();
+                // AllOrigins trả về dữ liệu trong biến .contents dưới dạng chuỗi
+                const data = JSON.parse(json.contents);
+
                 document.getElementById('result').innerHTML = data.map(s => `
-                    <tr>
-                        <td>${s.name}</td>
-                        <td>${s.mssv}</td>
-                        <td>${s.class_name}</td>
-                        <td>
-                            <button class="btn-edit" onclick="editStudent(${s.id}, '${s.name}', '${s.mssv}', '${s.class_name}')">Sửa</button>
-                            <button class="btn-delete" onclick="deleteStudent(${s.id})">Xóa</button>
-                        </td>
-                    </tr>
-                `).join('');
+            <tr>
+                <td>${s.name}</td>
+                <td>${s.mssv}</td>
+                <td>${s.class_name}</td>
+                <td>
+                    <button class="btn-edit" onclick="editStudent(${s.id}, '${s.name}', '${s.mssv}', '${s.class_name}')">Sửa</button>
+                    <button class="btn-delete" onclick="deleteStudent(${s.id})">Xóa</button>
+                </td>
+            </tr>
+        `).join('');
             } catch (err) {
-                console.error("Lỗi:", err);
-                document.getElementById('result').innerHTML = '<tr><td colspan="4" style="text-align:center; color:red">Vui lòng truy cập <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">link này</a> và bấm "Request temporary access" để kích hoạt Proxy!</td></tr>';
+                console.error("Lỗi Project 2:", err);
             }
         }
+
+        // CẬP NHẬT HÀM ADD/EDIT/DELETE CŨNG PHẢI DÙNG API MỚI NÀY
 
         async function addStudent() {
             const name = document.getElementById('name').value;
